@@ -1,0 +1,24 @@
+{
+  "name": "vugana-rwanda",
+  "version": "1.0.0",
+  "description": "VUGANA - GBV Reporting & Support Platform for Rwanda",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "gbv",
+    "rwanda",
+    "isange-one-stop-centre",
+    "reporting",
+    "anonymous",
+    "kinyarwanda"
+  ],
+  "author": "Dedine Mukabucyana (African Leadership University)",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

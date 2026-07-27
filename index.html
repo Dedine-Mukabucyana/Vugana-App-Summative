@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VUGANA — GBV Reporting & Support Platform for Rwanda</title>
+  <meta name="description" content="Vugana ('Speak Out') provides survivors and witnesses in Rwanda with a secure, confidential online platform to report gender-based violence anonymously and locate nearby Isange One Stop Centres.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+
+<body>
+
+  <!-- TOP EMERGENCY & SAFETY BAR -->
+  <div class="top-emergency-bar">
+    <div class="emergency-info">
+      <span class="pulse-dot"></span>
+      <span data-i18n="nav.hotline">Emergency Toll-Free: 116</span> | <span style="font-weight: 400;">Isange One Stop Centre Rwanda</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn-lang-toggle" id="langToggleBtn">🇷🇼 Kinyarwanda</button>
+      <button class="btn-theme-toggle" id="themeToggleBtn">🌙 Dark</button>
+      <button class="btn-quick-exit" data-i18n="nav.quick_exit">Quick Exit ✖</button>
+    </div>
+  </div>
+
+  <!-- MAIN NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-brand" data-navigate="view-home">
+        <div class="brand-icon">V</div>
+        <div>
+          <span class="brand-name">VUGANA</span>
+          <span class="brand-tagline" data-i18n="nav.tagline">Speak Out — Rwanda GBV Portal</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Menu">☰</button>
+
+      <ul class="nav-links" id="navMenu">
+        <li><a href="#" class="nav-link active" data-navigate="view-home" data-i18n="nav.home">Home</a></li>
+        <li><a href="#" class="nav-link" data-navigate="view-report" data-i18n="nav.report">Report Anonymously</a></li>
+        <li><a href="#" class="nav-link" data-navigate="view-track" data-i18n="nav.track">Track Report</a></li>
+        <li><a href="#" class="nav-link" data-navigate="view-centres" data-i18n="nav.centres">Isange Centres</a></li>
+        <li><a href="#" class="nav-link" data-navigate="view-rights" data-i18n="nav.rights">Rights & Guide</a></li>
+        <li><a href="#" class="nav-link" data-navigate="view-staff" data-i18n="nav.staff">Isange Staff Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="main-content">
+
+    <!-- VIEW 1: HOME PAGE -->
+    <div id="view-home" class="page-view active">
+      <section class="hero">
+        <div class="hero-container">
+          <span class="hero-badge" data-i18n="hero.badge">Confidential • Safe • Free</span>
+          <h1 class="hero-title" data-i18n="hero.title">Break the Silence. Report Safely & Anonymously in Rwanda.</h1>
+          <p class="hero-subtitle" data-i18n="hero.subtitle">
+            Vugana ('Speak Out') enables GBV survivors and witnesses in Rwanda to report incidents without logging in, track report responses using a secret code, and access nearest Isange One Stop Support Centres.
+          </p>
+          <div class="hero-cta-group">
+            <button class="btn-primary" data-navigate="view-report">
+              📝 <span data-i18n="hero.cta_report">Report Incident Now</span>
+            </button>
+            <button class="btn-secondary" data-navigate="view-track">
+              🔍 <span data-i18n="hero.cta_track">Track Existing Report</span>
+            </button>
+            <button class="btn-secondary" data-navigate="view-rights">
+              ⚖️ <span data-i18n="hero.cta_rights">Know Your Legal Rights</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATS & HIGHLIGHTS -->
+      <section class="stats-bar">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number" data-i18n="stats.stat1_num">100%</div>
+            <div class="stat-text" data-i18n="stats.stat1_text">Anonymous & Confidential</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-i18n="stats.stat2_num">30</div>
+            <div class="stat-text" data-i18n="stats.stat2_text">Districts Covered in Rwanda</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-i18n="stats.stat3_num">24/7</div>
+            <div class="stat-text" data-i18n="stats.stat3_text">Free Isange Support</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-i18n="stats.stat4_num">116</div>
+            <div class="stat-text" data-i18n="stats.stat4_text">National Emergency Hotline</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- THREE CORE FUNCTION COLUMNS -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        <div class="card">
+          <h3 class="card-title">🔒 Anonymous Reporting</h3>
+          <p class="card-subtitle">Submit a detailed report without revealing your name or phone number. Assigned directly to your district's Isange Centre.</p>
+          <button class="btn-secondary" data-navigate="view-report" style="width: 100%;">Start Anonymous Report →</button>
+        </div>
+        <div class="card">
+          <h3 class="card-title">🔑 Secret Code Tracking</h3>
+          <p class="card-subtitle">Receive a unique tracking code (e.g. VGN-482910) to return anytime and check responses from Isange social workers.</p>
+          <button class="btn-secondary" data-navigate="view-track" style="width: 100%;">Enter Code →</button>
+        </div>
+        <div class="card">
+          <h3 class="card-title">🏥 Isange Centre Locator</h3>
+          <p class="card-subtitle">Find contact numbers, emergency housing, and locations for Isange One Stop Centres across all 30 districts of Rwanda.</p>
+          <button class="btn-secondary" data-navigate="view-centres" style="width: 100%;">Find Nearest Centre →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: ANONYMOUS REPORT FORM -->
+    <div id="view-report" class="page-view">
+      <div class="card">
+        <h2 class="card-title" data-i18n="report_form.title">Anonymous GBV Incident Report</h2>
+        <p class="card-subtitle" data-i18n="report_form.desc">
+          You do NOT need to give your name or phone number. Your safety and privacy are fully protected under Rwandan law.
+        </p>
+
+        <form id="anonymousReportForm">
+          <!-- STEP 1: LOCATION -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="report_form.step1_title">1. Incident Location</label>
+            <select id="reportDistrictSelect" class="form-select" required>
+              <option value="">-- Select District --</option>
+            </select>
+          </div>
+
+          <!-- STEP 2: INCIDENT DETAILS -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="report_form.step2_title">2. Incident Details</label>
+            <label class="form-label" style="font-weight: 500; font-size: 0.85rem;" data-i18n="report_form.type_label">Type of Abuse *</label>
+            <select id="abuseTypeSelect" class="form-select" required style="margin-bottom: 12px;">
+              <option value="">Select Type of Abuse</option>
+            </select>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label class="form-label" style="font-weight: 500; font-size: 0.85rem;" data-i18n="report_form.date_label">Incident Date *</label>
+                <input type="date" id="incidentDateInput" class="form-control" required>
+              </div>
+              <div>
+                <label class="form-label" style="font-weight: 500; font-size: 0.85rem;" data-i18n="report_form.time_label">Incident Time</label>
+                <input type="time" id="incidentTimeInput" class="form-control">
+              </div>
+            </div>
+
+            <label class="form-label" style="font-weight: 500; font-size: 0.85rem;" data-i18n="report_form.desc_label">Describe What Happened *</label>
+            <textarea id="incidentDescInput" class="form-control" required data-i18n-placeholder="report_form.desc_placeholder" placeholder="Provide as much detail as you feel comfortable sharing..."></textarea>
+          </div>
+
+          <!-- STEP 3: OPTIONAL CONTACT -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="report_form.step3_title">3. Optional Contact Info (Voluntary)</label>
+            <p class="form-hint" style="margin-bottom: 10px;" data-i18n="report_form.contact_notice">Leaving these blank keeps your report 100% anonymous.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <input type="text" id="optionalNameInput" class="form-control" data-i18n-placeholder="report_form.name_placeholder" placeholder="Your Name (Optional)">
+              </div>
+              <div>
+                <input type="text" id="optionalPhoneInput" class="form-control" data-i18n-placeholder="report_form.phone_placeholder" placeholder="Your Phone Number (Optional)">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 16px;">
+            🛡️ <span data-i18n="report_form.submit_btn">Submit Anonymous Report Securely</span>
+          </button>
+        </form>
+
+        <!-- SUCCESS STATE DISPLAY -->
+        <div id="reportSuccessResult" style="display: none;">
+          <div class="code-banner-box">
+            <h3 data-i18n="report_form.success_title">Report Submitted Successfully!</h3>
+            <p data-i18n="report_form.code_heading">YOUR SECRET TRACKING CODE:</p>
+            <div class="code-display" id="generatedCodeDisplay">VGN-XXXXXX</div>
+            <div>
+              <button class="btn-secondary" id="copyCodeBtn" style="padding: 6px 16px; font-size: 0.88rem; margin-top: 4px;">📋 Copy Code</button>
+            </div>
+            <p style="font-size: 0.88rem; margin-top: 14px; opacity: 0.9;" data-i18n="report_form.code_warning">
+              IMPORTANT: Save or copy this code! It is the ONLY way you can return later to check updates and responses from Isange One Stop Centre staff.
+            </p>
+          </div>
+          
+          <button class="btn-primary" id="trackNowWithCodeBtn" style="width: 100%; justify-content: center;">
+            🔍 <span data-i18n="report_form.track_now_btn">Check Status Now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: TRACK REPORT -->
+    <div id="view-track" class="page-view">
+      <div class="card">
+        <h2 class="card-title" data-i18n="tracking.title">Track Your GBV Report</h2>
+        <p class="card-subtitle" data-i18n="tracking.subtitle">
+          Enter your confidential tracking code (e.g. VGN-482910) to view official responses, assigned Isange social workers, and progress updates.
+        </p>
+
+        <form id="reportTrackForm" style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <input type="text" id="trackCodeInput" class="form-control" required placeholder="e.g. VGN-482910" style="text-transform: uppercase; font-family: monospace; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;">
+          <button type="submit" class="btn-primary" style="white-space: nowrap;">
+            🔍 <span data-i18n="tracking.search_btn">Find Report</span>
+          </button>
+        </form>
+
+        <div id="trackErrorBox" class="alert-box" style="display: none;"></div>
+
+        <!-- TRACKING RESULTS CONTAINER -->
+        <div id="trackResultBox" style="display: none;">
+          <div style="background: var(--bg-main); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md); margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="form-hint">Tracking Code</span>
+                <h3 id="resCode" style="font-family: monospace; font-size: 1.5rem; color: var(--primary);">VGN-000000</h3>
+                <p><strong>Abuse Type:</strong> <span id="resAbuseType">-</span></p>
+                <p><strong>Assigned Isange Centre:</strong> <span id="resCentre">-</span></p>
+                <p><strong>Submitted Date:</strong> <span id="resDate">-</span></p>
+              </div>
+              <div>
+                <span class="form-hint">Current Status</span>
+                <div>
+                  <span id="resStatusBadge" class="status-badge status-submitted">Submitted</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="card-title" style="font-size: 1.3rem;" data-i18n="tracking.timeline_title">Case Resolution Timeline & Messages</h3>
+          <div id="resTimeline" class="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: ISANGE CENTRES DIRECTORY -->
+    <div id="view-centres" class="page-view">
+      <div class="card">
+        <h2 class="card-title" data-i18n="centres_page.title">Find Nearby Isange One Stop Centre</h2>
+        <p class="card-subtitle" data-i18n="centres_page.subtitle">
+          Isange One Stop Centres provide 24/7 free medical care, trauma counseling, forensic evidence collection, safe shelter, and legal support in all 44 hospital locations across Rwanda's 30 districts.
+        </p>
+
+        <div style="max-width: 400px; margin-bottom: 20px;">
+          <label class="form-label" data-i18n="centres_page.filter_label">Filter by District:</label>
+          <select id="centreDistrictFilter" class="form-select"></select>
+        </div>
+
+        <div id="isangeGridContainer" class="centres-grid"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: RIGHTS & ABUSE GUIDE -->
+    <div id="view-rights" class="page-view">
+      <div class="card">
+        <h2 class="card-title" data-i18n="rights_page.title">Know Your Rights & GBV Legal Protections in Rwanda</h2>
+        <p class="card-subtitle" data-i18n="rights_page.subtitle">
+          Empower yourself with clear information on Law N°68/2018, survivor rights, emergency steps, and self-assessment tools.
+        </p>
+
+        <div class="rights-tabs">
+          <button class="tab-btn active" data-tab="tab-legal" data-i18n="rights_page.tab_rights">Your Legal Rights</button>
+          <button class="tab-btn" data-tab="tab-quiz" data-i18n="rights_page.tab_abuse_quiz">Is This Abuse? (Self Check)</button>
+          <button class="tab-btn" data-tab="tab-faq" data-i18n="rights_page.tab_faq">FAQs</button>
+        </div>
+
+        <!-- TAB 1: LEGAL RIGHTS -->
+        <div id="tab-legal" class="tab-content-panel" style="display: block;">
+          <p style="font-weight: 600; margin-bottom: 16px; color: var(--primary);" data-i18n="rights_page.law_intro">
+            Under Rwandan Law N°68/2018 of 30/08/2018 on prevention and punishment of Gender-Based Violence:
+          </p>
+          <div class="rights-card-list">
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.right1_title">1. Right to Confidential & Free Medical Care</div>
+              <div data-i18n="rights_page.right1_desc">Every survivor of physical or sexual violence has the right to immediate, free emergency medical treatment, PEP (Post-Exposure Prophylaxis within 72 hours), and injury documentation.</div>
+            </div>
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.right2_title">2. Right to Privacy and Anonymity</div>
+              <div data-i18n="rights_page.right2_desc">The law strictly forbids exposing the identity of a GBV victim in media or public records without explicit consent.</div>
+            </div>
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.right3_title">3. Right to Legal Defense & Justice</div>
+              <div data-i18n="rights_page.right3_desc">GBV is a public crime in Rwanda. The Rwanda Investigation Bureau (RIB) and Prosecution handle cases free of charge.</div>
+            </div>
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.right4_title">4. Right to Psychosocial Counseling & Safe Shelter</div>
+              <div data-i18n="rights_page.right4_desc">Isange One Stop Centres provide free professional mental health therapy and temporary emergency protection.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: SELF CHECK QUIZ -->
+        <div id="tab-quiz" class="tab-content-panel" style="display: none;">
+          <h3 class="rights-box-title" data-i18n="rights_page.quiz_title">Self-Assessment: Identifying Abuse</h3>
+          <p class="card-subtitle" data-i18n="rights_page.quiz_desc">Violence is not always physical. Select any statement below that applies to your situation:</p>
+          
+          <div class="quiz-checklist">
+            <label class="quiz-item">
+              <input type="checkbox">
+              <span>Does your partner or family member physically hit, slap, push, or threaten you?</span>
+            </label>
+            <label class="quiz-item">
+              <input type="checkbox">
+              <span>Are you forced into sexual acts against your will or without consent?</span>
+            </label>
+            <label class="quiz-item">
+              <input type="checkbox">
+              <span>Does someone control all your money, prevent you from working, or deny food/basic needs?</span>
+            </label>
+            <label class="quiz-item">
+              <input type="checkbox">
+              <span>Are you constantly insulted, humiliated, threatened, or isolated from friends/family?</span>
+            </label>
+            <label class="quiz-item">
+              <input type="checkbox">
+              <span>Are you being stalked, monitored digitally, or threatened with public shame?</span>
+            </label>
+          </div>
+
+          <div id="quizAlertBox" class="alert-box" style="display: none;">
+            <strong data-i18n="rights_page.quiz_alert_title">If you answered YES to any of these statements:</strong>
+            <p data-i18n="rights_page.quiz_alert_desc">You are experiencing Gender-Based Violence. You are NOT alone, and it is NOT your fault. Help is available free of charge 24/7.</p>
+            <button class="btn-primary" data-navigate="view-report" style="margin-top: 12px;">Report Anonymously Now</button>
+          </div>
+        </div>
+
+        <!-- TAB 3: FAQS -->
+        <div id="tab-faq" class="tab-content-panel" style="display: none;">
+          <div class="rights-card-list">
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.faq1_q">Can I report if I am not sure I want to go to court?</div>
+              <div data-i18n="rights_page.faq1_a">Yes! Submitting an anonymous report on Vugana allows Isange staff to offer medical and psychological support without forcing legal charges if you are not ready.</div>
+            </div>
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.faq2_q">Does Vugana cost any money to use?</div>
+              <div data-i18n="rights_page.faq2_a">No. Vugana is 100% free to access on any mobile phone or computer.</div>
+            </div>
+            <div class="rights-box">
+              <div class="rights-box-title" data-i18n="rights_page.faq3_q">What happens if someone opens my browser while I am using Vugana?</div>
+              <div data-i18n="rights_page.faq3_a">Use the red 'Quick Exit' button at the top of the page. It will immediately redirect your screen to a neutral website.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: ISANGE STAFF PORTAL -->
+    <div id="view-staff" class="page-view">
+      <!-- AUTHENTICATION CARD -->
+      <div id="staffAuthBox" class="card" style="max-width: 480px; margin: 40px auto; text-align: center;">
+        <h2 class="card-title" style="justify-content: center;" data-i18n="staff_portal.title">Isange One Stop Centre Staff Portal</h2>
+        <p class="card-subtitle" data-i18n="staff_portal.subtitle">
+          Authorized login for Isange social workers, medical officers, and RIB liaison officers to review district reports and update case progress.
+        </p>
+
+        <form id="staffLoginForm">
+          <div class="form-group" style="text-align: left;">
+            <label class="form-label" data-i18n="staff_portal.passcode_label">Enter Staff Access Passcode:</label>
+            <input type="password" id="staffPasscodeInput" class="form-control" required placeholder="Default passcode: isange2026">
+          </div>
+          <button type="submit" class="btn-primary" id="staffLoginBtn" style="width: 100%; justify-content: center;">
+            🔐 <span data-i18n="staff_portal.login_btn">Access Staff Dashboard</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- STAFF DASHBOARD VIEW -->
+      <div id="staffDashBox" class="card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+          <div>
+            <h2 class="card-title">Isange Case Management Dashboard</h2>
+            <p class="card-subtitle">Manage submitted GBV reports across Rwandan districts.</p>
+          </div>
+          <div>
+            <span class="status-badge status-submitted" style="font-size: 0.95rem; padding: 8px 16px;">
+              <span data-i18n="staff_portal.total_reports">Total Reports:</span> <strong id="staffTotalCount">0</strong>
+            </span>
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+          <div style="flex: 1; min-width: 200px;">
+            <label class="form-label" data-i18n="staff_portal.district_filter">Filter by District:</label>
+            <select id="staffDistrictFilter" class="form-select"></select>
+          </div>
+          <div style="flex: 1; min-width: 200px;">
+            <label class="form-label" data-i18n="staff_portal.status_filter">Filter by Status:</label>
+            <select id="staffStatusFilter" class="form-select">
+              <option value="ALL">All Statuses</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Action Taken">Action Taken</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- REPORTS TABLE -->
+        <div class="staff-table-wrapper">
+          <table class="staff-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>District</th>
+                <th>Abuse Category</th>
+                <th>Status</th>
+                <th>Submitted Date</th>
+                <th>Description Preview</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="staffReportsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- STAFF ACTION MODAL OVERLAY -->
+  <div id="staffModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; padding: 20px;">
+    <div style="background: var(--bg-card); max-width: 600px; width: 100%; border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="card-title" style="font-size: 1.3rem;">Isange Staff Action & Response</h3>
+        <button id="closeModalBtn" style="background: none; font-size: 1.4rem; color: var(--text-muted);">✖</button>
+      </div>
+
+      <form id="staffRespondForm">
+        <input type="hidden" id="modalReportCode">
+        
+        <div style="background: var(--bg-main); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 0.9rem;">
+          <p><strong>Tracking Code:</strong> <span id="modalCodeDisplay">-</span></p>
+          <p style="margin-top: 6px;"><strong>Incident Description:</strong></p>
+          <p id="modalDescDisplay" style="color: var(--text-muted); font-style: italic; margin-top: 2px;">-</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Staff Officer Name / Title:</label>
+          <input type="text" id="modalStaffName" class="form-control" value="Isange Social Worker">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="staff_portal.status_update_label">Update Report Status:</label>
+          <select id="modalStaffStatus" class="form-select">
+            <option value="Submitted">Submitted</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Action Taken">Action Taken / Support Provided</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="staff_portal.message_label">Staff Note / Action Taken for Survivor:</label>
+          <textarea id="modalStaffMessage" class="form-control" required data-i18n-placeholder="staff_portal.message_placeholder" placeholder="e.g. Medical examination arranged at District Hospital. Social worker assigned. Please contact Hotline 116..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+          ✉️ <span data-i18n="staff_portal.submit_response_btn">Send Response to Tracking Code</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div>
+        <div class="footer-brand-title">VUGANA</div>
+        <p>Speak Out — GBV Reporting & Support Platform for Rwanda.</p>
+        <p style="margin-top: 8px;">Supporting survivors with safe, anonymous reporting and direct links to Isange One Stop Centres.</p>
+      </div>
+      <div>
+        <h4 style="color: #ffffff; margin-bottom: 12px;">Emergency Contacts</h4>
+        <p>🚨 Police GBV Hotline: <strong>116</strong></p>
+        <p>🚑 Medical Emergency: <strong>912</strong></p>
+        <p>🏢 Isange Referral: <strong>Kacyiru Hospital</strong></p>
+        <p>🏛️ Government Partner: <strong>MIGEPROF Rwanda</strong></p>
+      </div>
+      <div>
+        <h4 style="color: #ffffff; margin-bottom: 12px;">Quick Navigation</h4>
+        <p><a href="#" data-navigate="view-report" style="color: #94a3b8;">Report Anonymously</a></p>
+        <p><a href="#" data-navigate="view-track" style="color: #94a3b8;">Track Report Status</a></p>
+        <p><a href="#" data-navigate="view-centres" style="color: #94a3b8;">Isange District Centres</a></p>
+        <p><a href="#" data-navigate="view-rights" style="color: #94a3b8;">Rwandan Legal Rights (Law N°68/2018)</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 VUGANA Project by Dedine Mukabucyana (African Leadership University). Built in support of MIGEPROF & Isange One Stop Centres Rwanda.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT INCLUDES -->
+  <script src="js/data/isange_centres.js"></script>
+  <script src="js/data/rights_i18n.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
