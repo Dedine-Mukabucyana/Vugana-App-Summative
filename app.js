@@ -1,537 +1,460 @@
-/**
- * VUGANA — Application Controller & UI Logic (js/app.js)
- */
+/* ==========================================================================
+   VUGANA — App logic
+   ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Global App State
-  const state = {
-    currentLang: localStorage.getItem('vugana_lang') || 'en',
-    currentTheme: localStorage.getItem('vugana_theme') || 'light',
-    staffAuthenticated: false,
-    activeStaffReport: null
-  };
-
-  // Initialize UI & Event Listeners
+document.addEventListener("DOMContentLoaded", function () {
   initTheme();
   initLanguage();
   initNavigation();
-  initFormControls();
-  initIsangeDirectory();
-  initRightsTab();
-  initStaffPortal();
+  initMobileNav();
   initQuickExit();
-
-  // -------------------------------------------------------------
-  // 1. Theme Initialization
-  // -------------------------------------------------------------
-  function initTheme() {
-    document.documentElement.setAttribute('data-theme', state.currentTheme);
-    const themeBtn = document.getElementById('themeToggleBtn');
-    if (themeBtn) {
-      themeBtn.textContent = state.currentTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
-      themeBtn.addEventListener('click', () => {
-        state.currentTheme = state.currentTheme === 'light' ? 'dark' : 'light';
-        localStorage.setItem('vugana_theme', state.currentTheme);
-        document.documentElement.setAttribute('data-theme', state.currentTheme);
-        themeBtn.textContent = state.currentTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
-      });
-    }
-  }
-
-  // -------------------------------------------------------------
-  // 2. Language & Internationalization (i18n)
-  // -------------------------------------------------------------
-  function initLanguage() {
-    const langBtn = document.getElementById('langToggleBtn');
-    if (langBtn) {
-      langBtn.textContent = state.currentLang === 'en' ? '🇷🇼 Kinyarwanda' : '🇬🇧 English';
-      langBtn.addEventListener('click', () => {
-        state.currentLang = state.currentLang === 'en' ? 'rw' : 'en';
-        localStorage.setItem('vugana_lang', state.currentLang);
-        langBtn.textContent = state.currentLang === 'en' ? '🇷🇼 Kinyarwanda' : '🇬🇧 English';
-        applyTranslations();
-      });
-    }
-    applyTranslations();
-  }
-
-  function applyTranslations() {
-    const lang = state.currentLang;
-    const dict = I18N_DATA[lang] || I18N_DATA.en;
-
-    // Data-i18n text replacement
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const text = getNestedValue(dict, key);
-      if (text) el.textContent = text;
-    });
-
-    // Data-i18n-placeholder replacement
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      const key = el.getAttribute('data-i18n-placeholder');
-      const text = getNestedValue(dict, key);
-      if (text) el.placeholder = text;
-    });
-
-    // Update dynamic options for abuse types in report form
-    const abuseSelect = document.getElementById('abuseTypeSelect');
-    if (abuseSelect && dict.report_form && dict.report_form.type_options) {
-      const currentVal = abuseSelect.value;
-      abuseSelect.innerHTML = `<option value="">${dict.report_form.type_label}</option>` +
-        dict.report_form.type_options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-      if (currentVal) abuseSelect.value = currentVal;
-    }
-
-    // Refresh active components if open
-    renderIsangeCentres();
-  }
-
-  function getNestedValue(obj, path) {
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-  }
-
-  // -------------------------------------------------------------
-  // 3. Navigation & Single Page Routing
-  // -------------------------------------------------------------
-  function initNavigation() {
-    const navLinks = document.querySelectorAll('.nav-link, [data-navigate]');
-    const pageViews = document.querySelectorAll('.page-view');
-    const mobileToggle = document.getElementById('mobileNavToggle');
-    const navMenu = document.getElementById('navMenu');
-
-    function navigateTo(viewId) {
-      pageViews.forEach(view => {
-        if (view.id === viewId) {
-          view.classList.add('active');
-        } else {
-          view.classList.remove('active');
-        }
-      });
-
-      document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.getAttribute('data-navigate') === viewId) {
-          link.classList.add('active');
-        } else {
-          link.classList.remove('active');
-        }
-      });
-
-      if (navMenu) navMenu.classList.remove('mobile-open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetView = link.getAttribute('data-navigate');
-        if (targetView) navigateTo(targetView);
-      });
-    });
-
-    if (mobileToggle && navMenu) {
-      mobileToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('mobile-open');
-      });
-    }
-
-    // Expose navigate globally
-    window.vuganaNavigate = navigateTo;
-  }
-
-  // -------------------------------------------------------------
-  // 4. Anonymous Report Submission Form
-  // -------------------------------------------------------------
-  function initFormControls() {
-    const districtSelect = document.getElementById('reportDistrictSelect');
-    const form = document.getElementById('anonymousReportForm');
-    const resultBox = document.getElementById('reportSuccessResult');
-    const codeDisplay = document.getElementById('generatedCodeDisplay');
-    const copyBtn = document.getElementById('copyCodeBtn');
-
-    // Populate Rwandan Districts dropdown
-    if (districtSelect) {
-      districtSelect.innerHTML = `<option value="">-- Select District --</option>` +
-        RWANDA_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
-    }
-
-    if (form) {
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const district = districtSelect.value;
-        const abuseType = document.getElementById('abuseTypeSelect').value;
-        const incidentDate = document.getElementById('incidentDateInput').value;
-        const incidentTime = document.getElementById('incidentTimeInput').value;
-        const description = document.getElementById('incidentDescInput').value;
-        const optionalName = document.getElementById('optionalNameInput').value;
-        const optionalPhone = document.getElementById('optionalPhoneInput').value;
-
-        if (!district || !abuseType || !description) {
-          alert('Please fill in the required fields (District, Abuse Type, and Description).');
-          return;
-        }
-
-        // Find nearest matching Isange Centre for selected district
-        const matchedCentre = ISANGE_CENTRES.find(c => c.district.toLowerCase() === district.toLowerCase());
-        const centreName = matchedCentre ? matchedCentre.name : `Isange One Stop Centre (${district})`;
-        const provinceName = matchedCentre ? matchedCentre.province : 'Rwanda';
-
-        const payload = {
-          district: district,
-          province: provinceName,
-          abuse_type: abuseType,
-          incident_date: incidentDate,
-          incident_time: incidentTime,
-          description: description,
-          optional_name: optionalName,
-          optional_phone: optionalPhone,
-          isange_centre: centreName
-        };
-
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting Encrypted Report...';
-
-        try {
-          const response = await VuganaDB.submitReport(payload);
-          if (response && response.tracking_code) {
-            form.style.display = 'none';
-            resultBox.style.display = 'block';
-            codeDisplay.textContent = response.tracking_code;
-
-            // Set track action
-            document.getElementById('trackNowWithCodeBtn').onclick = () => {
-              document.getElementById('trackCodeInput').value = response.tracking_code;
-              window.vuganaNavigate('view-track');
-              performTracking(response.tracking_code);
-            };
-          } else {
-            alert('Could not submit report. Please try again.');
-          }
-        } catch (err) {
-          alert('An error occurred during submission. Please try again.');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = I18N_DATA[state.currentLang].report_form.submit_btn;
-        }
-      });
-    }
-
-    if (copyBtn && codeDisplay) {
-      copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(codeDisplay.textContent.trim());
-        const orig = copyBtn.textContent;
-        copyBtn.textContent = '✓ Copied!';
-        setTimeout(() => copyBtn.textContent = orig, 2000);
-      });
-    }
-
-    // Tracking Form Trigger
-    const trackForm = document.getElementById('reportTrackForm');
-    if (trackForm) {
-      trackForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const code = document.getElementById('trackCodeInput').value;
-        performTracking(code);
-      });
-    }
-  }
-
-  // Perform tracking search
-  async function performTracking(code) {
-    const resultBox = document.getElementById('trackResultBox');
-    const errorBox = document.getElementById('trackErrorBox');
-    
-    if (!code || !code.trim()) {
-      errorBox.style.display = 'block';
-      errorBox.textContent = 'Please enter a valid tracking code.';
-      resultBox.style.display = 'none';
-      return;
-    }
-
-    const res = await VuganaDB.trackReport(code);
-    if (res && res.report) {
-      const report = res.report;
-      errorBox.style.display = 'none';
-      resultBox.style.display = 'block';
-
-      document.getElementById('resCode').textContent = report.tracking_code;
-      document.getElementById('resCentre').textContent = report.isange_centre;
-      document.getElementById('resDate').textContent = new Date(report.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      document.getElementById('resAbuseType').textContent = report.abuse_type;
-
-      // Status Badge
-      const statusBadge = document.getElementById('resStatusBadge');
-      statusBadge.textContent = report.status;
-      statusBadge.className = 'status-badge ' + (
-        report.status === 'Submitted' ? 'status-submitted' :
-        report.status === 'Under Review' ? 'status-review' : 'status-action'
-      );
-
-      // Render Messages Timeline
-      const timeline = document.getElementById('resTimeline');
-      timeline.innerHTML = '';
-
-      if (report.responses && report.responses.length > 0) {
-        report.responses.forEach(resp => {
-          const timeStr = new Date(resp.created_at).toLocaleString();
-          const item = document.createElement('div');
-          item.className = 'timeline-item';
-          item.innerHTML = `
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <span class="timeline-author">${escapeHtml(resp.staff_name)}</span>
-                <span class="timeline-time">${timeStr}</span>
-              </div>
-              <p style="margin-top: 4px; font-size: 0.95rem;">${escapeHtml(resp.message)}</p>
-              ${resp.status_change ? `<span class="service-tag" style="margin-top: 8px; display: inline-block;">Status: ${escapeHtml(resp.status_change)}</span>` : ''}
-            </div>
-          `;
-          timeline.appendChild(item);
-        });
-      } else {
-        timeline.innerHTML = `<p style="color: var(--text-muted);">${I18N_DATA[state.currentLang].tracking.no_history}</p>`;
-      }
-    } else {
-      resultBox.style.display = 'none';
-      errorBox.style.display = 'block';
-      errorBox.textContent = res.error || I18N_DATA[state.currentLang].tracking.error_not_found;
-    }
-  }
-
-  // -------------------------------------------------------------
-  // 5. Isange One Stop Centres Directory
-  // -------------------------------------------------------------
-  function initIsangeDirectory() {
-    const districtFilter = document.getElementById('centreDistrictFilter');
-    if (districtFilter) {
-      districtFilter.innerHTML = `<option value="ALL">All Districts (30 Districts)</option>` +
-        RWANDA_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
-
-      districtFilter.addEventListener('change', () => {
-        renderIsangeCentres(districtFilter.value);
-      });
-    }
-    renderIsangeCentres();
-  }
-
-  function renderIsangeCentres(filterDistrict = 'ALL') {
-    const grid = document.getElementById('isangeGridContainer');
-    if (!grid) return;
-
-    let centres = ISANGE_CENTRES;
-    if (filterDistrict !== 'ALL') {
-      centres = centres.filter(c => c.district.toLowerCase() === filterDistrict.toLowerCase());
-    }
-
-    grid.innerHTML = '';
-    centres.forEach(c => {
-      const card = document.createElement('div');
-      card.className = 'centre-card';
-      card.innerHTML = `
-        <div>
-          <div class="centre-district-tag">${c.district} District • ${c.province}</div>
-          <h3 class="centre-name">${c.name}</h3>
-          <div class="centre-detail">📍 <strong>Location:</strong> ${c.location}</div>
-          <div class="centre-detail">📞 <strong>Direct Line:</strong> <a href="tel:${c.phone}">${c.phone}</a></div>
-          <div class="centre-detail">🚨 <strong>Toll-Free Hotline:</strong> <a href="tel:116">116</a></div>
-          <div class="centre-detail">🚔 <strong>RIB / Police Unit:</strong> ${c.police_station}</div>
-        </div>
-        <div>
-          <div class="centre-services-tags">
-            ${c.services.map(s => `<span class="service-tag">${s}</span>`).join('')}
-          </div>
-          <a href="tel:${c.phone}" class="btn-primary" style="width: 100%; margin-top: 16px; justify-content: center; font-size: 0.9rem; padding: 10px;">
-            📞 Call Centre Now
-          </a>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
-
-  // -------------------------------------------------------------
-  // 6. Rights & Quiz Interactive Tabs
-  // -------------------------------------------------------------
-  function initRightsTab() {
-    const tabBtns = document.querySelectorAll('.rights-tabs .tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content-panel');
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.style.display = 'none');
-
-        btn.classList.add('active');
-        const targetId = btn.getAttribute('data-tab');
-        const targetPanel = document.getElementById(targetId);
-        if (targetPanel) targetPanel.style.display = 'block';
-      });
-    });
-
-    // Quiz Checkbox Listener
-    const quizCheckboxes = document.querySelectorAll('.quiz-item input[type="checkbox"]');
-    const alertBox = document.getElementById('quizAlertBox');
-
-    quizCheckboxes.forEach(chk => {
-      chk.addEventListener('change', () => {
-        const checkedCount = document.querySelectorAll('.quiz-item input[type="checkbox"]:checked').length;
-        if (alertBox) {
-          alertBox.style.display = checkedCount > 0 ? 'block' : 'none';
-        }
-      });
-    });
-  }
-
-  // -------------------------------------------------------------
-  // 7. Isange Staff Portal & Case Management
-  // -------------------------------------------------------------
-  function initStaffPortal() {
-    const loginForm = document.getElementById('staffLoginForm');
-    const authBox = document.getElementById('staffAuthBox');
-    const dashBox = document.getElementById('staffDashBox');
-    const passcodeBtn = document.getElementById('staffLoginBtn');
-
-    if (loginForm) {
-      loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const code = document.getElementById('staffPasscodeInput').value.trim();
-        if (code === 'isange2026' || code === 'admin') {
-          state.staffAuthenticated = true;
-          authBox.style.display = 'none';
-          dashBox.style.display = 'block';
-          loadStaffDashboard();
-        } else {
-          alert('Invalid passcode. Default passcode is: isange2026');
-        }
-      });
-    }
-
-    const filterDistrict = document.getElementById('staffDistrictFilter');
-    const filterStatus = document.getElementById('staffStatusFilter');
-
-    if (filterDistrict) {
-      filterDistrict.innerHTML = `<option value="ALL">All Districts</option>` +
-        RWANDA_DISTRICTS.map(d => `<option value="${d}">${d}</option>`).join('');
-
-      filterDistrict.addEventListener('change', loadStaffDashboard);
-    }
-    if (filterStatus) {
-      filterStatus.addEventListener('change', loadStaffDashboard);
-    }
-
-    // Response Modal Handler
-    const respondForm = document.getElementById('staffRespondForm');
-    if (respondForm) {
-      respondForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const code = document.getElementById('modalReportCode').value;
-        const msg = document.getElementById('modalStaffMessage').value;
-        const newStatus = document.getElementById('modalStaffStatus').value;
-        const staffName = document.getElementById('modalStaffName').value;
-
-        if (!msg) {
-          alert('Please enter a response message.');
-          return;
-        }
-
-        const res = await VuganaDB.addStaffResponse({
-          tracking_code: code,
-          staff_name: staffName || 'Isange Officer',
-          message: msg,
-          new_status: newStatus
-        });
-
-        if (res && res.success) {
-          alert('Response and status update posted successfully!');
-          document.getElementById('staffModalOverlay').style.display = 'none';
-          loadStaffDashboard();
-        } else {
-          alert('Failed to post response.');
-        }
-      });
-    }
-
-    const modalClose = document.getElementById('closeModalBtn');
-    if (modalClose) {
-      modalClose.addEventListener('click', () => {
-        document.getElementById('staffModalOverlay').style.display = 'none';
-      });
-    }
-  }
-
-  async function loadStaffDashboard() {
-    if (!state.staffAuthenticated) return;
-
-    const district = document.getElementById('staffDistrictFilter').value;
-    const status = document.getElementById('staffStatusFilter').value;
-    const tbody = document.getElementById('staffReportsTbody');
-    const countEl = document.getElementById('staffTotalCount');
-
-    const reports = await VuganaDB.getAllReports(district, status);
-    if (countEl) countEl.textContent = reports.length;
-
-    tbody.innerHTML = '';
-    if (reports.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No reports found matching your criteria.</td></tr>`;
-      return;
-    }
-
-    reports.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong style="color: var(--primary); font-family: monospace;">${escapeHtml(r.tracking_code)}</strong></td>
-        <td>${escapeHtml(r.district)}</td>
-        <td>${escapeHtml(r.abuse_type)}</td>
-        <td><span class="status-badge ${r.status === 'Submitted' ? 'status-submitted' : r.status === 'Under Review' ? 'status-review' : 'status-action'}">${escapeHtml(r.status)}</span></td>
-        <td>${new Date(r.created_at).toLocaleDateString()}</td>
-        <td><div style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(r.description)}</div></td>
-        <td>
-          <button class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="openStaffModal('${r.tracking_code}')">
-            💬 Action & Reply
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Global helper for opening staff response modal
-  window.openStaffModal = async function(trackingCode) {
-    const res = await VuganaDB.trackReport(trackingCode);
-    if (res && res.report) {
-      const r = res.report;
-      document.getElementById('modalReportCode').value = r.tracking_code;
-      document.getElementById('modalCodeDisplay').textContent = r.tracking_code + ' (' + r.district + ')';
-      document.getElementById('modalDescDisplay').textContent = r.description;
-      document.getElementById('modalStaffStatus').value = r.status;
-      document.getElementById('modalStaffMessage').value = '';
-      document.getElementById('staffModalOverlay').style.display = 'flex';
-    }
-  };
-
-  // -------------------------------------------------------------
-  // 8. Safety Quick Exit Mechanism
-  // -------------------------------------------------------------
-  function initQuickExit() {
-    const exitBtns = document.querySelectorAll('.btn-quick-exit');
-    exitBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Immediately replace current window location with neutral weather site
-        window.location.replace('https://www.accuweather.com/en/rw/kigali/288484/weather-forecast/288484');
-      });
-    });
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+  populateDistrictSelects();
+  populateAbuseTypeSelect();
+  renderCentres();
+  initReportForm();
+  initTrackForm();
+  initRightsTabs();
+  initQuiz();
+  initStaffPortal();
 });
+
+/* --------------------------------------------------------------------
+   Theme (light / dark)
+   -------------------------------------------------------------------- */
+
+function initTheme() {
+  const saved = localStorage.getItem("vugana_theme") || "light";
+  document.documentElement.setAttribute("data-theme", saved);
+  updateThemeBtn(saved);
+
+  document.getElementById("themeToggleBtn").addEventListener("click", function () {
+    const current = document.documentElement.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("vugana_theme", next);
+    updateThemeBtn(next);
+  });
+}
+
+function updateThemeBtn(theme) {
+  const btn = document.getElementById("themeToggleBtn");
+  btn.textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
+}
+
+/* --------------------------------------------------------------------
+   Language (English / Kinyarwanda)
+   -------------------------------------------------------------------- */
+
+function initLanguage() {
+  const saved = localStorage.getItem("vugana_lang") || "en";
+  applyLanguage(saved);
+
+  document.getElementById("langToggleBtn").addEventListener("click", function () {
+    const current = localStorage.getItem("vugana_lang") || "en";
+    const next = current === "en" ? "rw" : "en";
+    localStorage.setItem("vugana_lang", next);
+    applyLanguage(next);
+  });
+}
+
+function applyLanguage(lang) {
+  const dict = I18N[lang] || I18N.en;
+
+  document.querySelectorAll("[data-i18n]").forEach(function (el) {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (dict[key]) el.setAttribute("placeholder", dict[key]);
+  });
+
+  const langBtn = document.getElementById("langToggleBtn");
+  langBtn.textContent = lang === "en" ? "🇷🇼 Kinyarwanda" : "🇬🇧 English";
+}
+
+/* --------------------------------------------------------------------
+   Navigation between page views
+   -------------------------------------------------------------------- */
+
+function initNavigation() {
+  document.querySelectorAll("[data-navigate]").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      const target = el.getAttribute("data-navigate");
+      showView(target);
+    });
+  });
+}
+
+function showView(viewId) {
+  document.querySelectorAll(".page-view").forEach(function (v) {
+    v.classList.toggle("active", v.id === viewId);
+  });
+  document.querySelectorAll(".nav-link").forEach(function (link) {
+    link.classList.toggle("active", link.getAttribute("data-navigate") === viewId);
+  });
+  document.getElementById("navMenu").classList.remove("open");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function initMobileNav() {
+  document.getElementById("mobileNavToggle").addEventListener("click", function () {
+    document.getElementById("navMenu").classList.toggle("open");
+  });
+}
+
+/* --------------------------------------------------------------------
+   Quick exit — immediately leaves the site
+   -------------------------------------------------------------------- */
+
+function initQuickExit() {
+  document.querySelectorAll(".btn-quick-exit").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      window.location.replace("https://www.google.com");
+    });
+  });
+
+  // Also bind the Esc key as a fast panic exit
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") window.location.replace("https://www.google.com");
+  });
+}
+
+/* --------------------------------------------------------------------
+   Populate district selects (report form, centres filter, staff filter)
+   -------------------------------------------------------------------- */
+
+function populateDistrictSelects() {
+  const selects = [
+    document.getElementById("reportDistrictSelect"),
+    document.getElementById("centreDistrictFilter"),
+    document.getElementById("staffDistrictFilter")
+  ];
+
+  selects.forEach(function (select) {
+    if (!select) return;
+    if (select.id !== "reportDistrictSelect") {
+      const allOpt = document.createElement("option");
+      allOpt.value = "ALL";
+      allOpt.textContent = "All Districts";
+      select.appendChild(allOpt);
+    }
+    RWANDA_DISTRICTS.forEach(function (d) {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      select.appendChild(opt);
+    });
+  });
+
+  const centreFilter = document.getElementById("centreDistrictFilter");
+  if (centreFilter) centreFilter.addEventListener("change", renderCentres);
+
+  const staffFilter = document.getElementById("staffDistrictFilter");
+  if (staffFilter) staffFilter.addEventListener("change", renderStaffTable);
+}
+
+function populateAbuseTypeSelect() {
+  const select = document.getElementById("abuseTypeSelect");
+  if (!select) return;
+  ABUSE_TYPES.forEach(function (type) {
+    const opt = document.createElement("option");
+    opt.value = type;
+    opt.textContent = type;
+    select.appendChild(opt);
+  });
+}
+
+/* --------------------------------------------------------------------
+   Isange Centres directory
+   -------------------------------------------------------------------- */
+
+function renderCentres() {
+  const container = document.getElementById("isangeGridContainer");
+  if (!container) return;
+  const filter = document.getElementById("centreDistrictFilter").value || "ALL";
+
+  const list = ISANGE_CENTRES.filter(function (c) {
+    return filter === "ALL" || filter === "" || c.district === filter;
+  });
+
+  container.innerHTML = list.map(function (c) {
+    return (
+      '<div class="centre-card">' +
+        "<h4>Isange OSC — " + c.district + "</h4>" +
+        "<p>" + c.hospital + "</p>" +
+        '<p class="centre-phone">📞 ' + c.phone + " (toll-free)</p>" +
+        "<p>🕒 " + c.hours + "</p>" +
+        "<p>" + c.services.join(", ") + "</p>" +
+      "</div>"
+    );
+  }).join("");
+}
+
+/* --------------------------------------------------------------------
+   Anonymous report form
+   -------------------------------------------------------------------- */
+
+function initReportForm() {
+  const form = document.getElementById("anonymousReportForm");
+  if (!form) return;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const report = {
+      district: document.getElementById("reportDistrictSelect").value,
+      abuseType: document.getElementById("abuseTypeSelect").value,
+      date: document.getElementById("incidentDateInput").value,
+      time: document.getElementById("incidentTimeInput").value,
+      description: document.getElementById("incidentDescInput").value,
+      name: document.getElementById("optionalNameInput").value,
+      phone: document.getElementById("optionalPhoneInput").value
+    };
+
+    const saved = vgSaveReport(report);
+
+    form.style.display = "none";
+    const resultBox = document.getElementById("reportSuccessResult");
+    resultBox.style.display = "block";
+    document.getElementById("generatedCodeDisplay").textContent = saved.code;
+
+    document.getElementById("copyCodeBtn").onclick = function () {
+      navigator.clipboard.writeText(saved.code);
+      this.textContent = "✅ Copied";
+      setTimeout(() => { this.textContent = "📋 Copy Code"; }, 1500);
+    };
+
+    document.getElementById("trackNowWithCodeBtn").onclick = function () {
+      form.style.display = "block";
+      resultBox.style.display = "none";
+      form.reset();
+      showView("view-track");
+      document.getElementById("trackCodeInput").value = saved.code;
+      document.getElementById("reportTrackForm").dispatchEvent(new Event("submit"));
+    };
+  });
+}
+
+/* --------------------------------------------------------------------
+   Track report form
+   -------------------------------------------------------------------- */
+
+function initTrackForm() {
+  const form = document.getElementById("reportTrackForm");
+  if (!form) return;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const code = document.getElementById("trackCodeInput").value.trim().toUpperCase();
+    const report = vgGetReport(code);
+
+    const errorBox = document.getElementById("trackErrorBox");
+    const resultBox = document.getElementById("trackResultBox");
+
+    if (!report) {
+      errorBox.style.display = "block";
+      errorBox.textContent = "No report found for code " + code + ". Please check the code and try again.";
+      resultBox.style.display = "none";
+      return;
+    }
+
+    errorBox.style.display = "none";
+    resultBox.style.display = "block";
+
+    document.getElementById("resCode").textContent = report.code;
+    document.getElementById("resAbuseType").textContent = report.abuseType;
+    document.getElementById("resCentre").textContent = "Isange OSC — " + report.district;
+    document.getElementById("resDate").textContent = report.date;
+
+    const badge = document.getElementById("resStatusBadge");
+    badge.textContent = report.status;
+    badge.className = "status-badge " + statusClass(report.status);
+
+    const timeline = document.getElementById("resTimeline");
+    timeline.innerHTML = report.timeline.map(function (t) {
+      return (
+        '<div class="timeline-item">' +
+          '<div class="t-meta">' + formatDate(t.at) + " · " + t.staffName + "</div>" +
+          '<div class="t-msg"><strong>' + t.status + ":</strong> " + escapeHtml(t.message) + "</div>" +
+        "</div>"
+      );
+    }).join("");
+  });
+}
+
+function statusClass(status) {
+  if (status === "Under Review") return "status-under-review";
+  if (status === "Action Taken") return "status-action-taken";
+  return "status-submitted";
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) +
+    " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* --------------------------------------------------------------------
+   Rights page tabs + self-check quiz
+   -------------------------------------------------------------------- */
+
+function initRightsTabs() {
+  document.querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content-panel").forEach(p => p.style.display = "none");
+      btn.classList.add("active");
+      document.getElementById(btn.getAttribute("data-tab")).style.display = "block";
+    });
+  });
+}
+
+function initQuiz() {
+  const checkboxes = document.querySelectorAll(".quiz-item input[type=checkbox]");
+  const alertBox = document.getElementById("quizAlertBox");
+  if (!checkboxes.length) return;
+
+  checkboxes.forEach(function (cb) {
+    cb.addEventListener("change", function () {
+      const anyChecked = Array.from(checkboxes).some(c => c.checked);
+      alertBox.style.display = anyChecked ? "block" : "none";
+    });
+  });
+}
+
+/* --------------------------------------------------------------------
+   Staff portal (DEMO auth — see note in db.js)
+   -------------------------------------------------------------------- */
+
+const VUGANA_DEMO_PASSCODES = {
+  staff: "isange2026",
+  admin: "admin2026"
+};
+
+let vgCurrentRole = "staff";
+
+function initStaffPortal() {
+  const loginForm = document.getElementById("staffLoginForm");
+  if (!loginForm) return;
+
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const role = document.getElementById("staffRoleSelect").value;
+    const entered = document.getElementById("staffPasscodeInput").value;
+
+    if (entered !== VUGANA_DEMO_PASSCODES[role]) {
+      alert("Incorrect passcode for this role. (Demo — Staff: isange2026, Admin: admin2026)");
+      return;
+    }
+
+    vgCurrentRole = role;
+    document.getElementById("staffAuthBox").style.display = "none";
+    document.getElementById("staffDashBox").style.display = "block";
+
+    const isAdmin = role === "admin";
+    document.getElementById("adminAnalyticsBox").style.display = isAdmin ? "block" : "none";
+    document.getElementById("staffDashTitle").textContent = isAdmin
+      ? "Admin Dashboard — All Districts"
+      : "Isange Case Management Dashboard";
+    document.getElementById("staffDashSubtitle").textContent = isAdmin
+      ? "System-wide oversight of GBV reports across all 30 districts."
+      : "Manage submitted GBV reports across Rwandan districts.";
+
+    renderStaffTable();
+  });
+
+  const statusFilter = document.getElementById("staffStatusFilter");
+  if (statusFilter) statusFilter.addEventListener("change", renderStaffTable);
+
+  document.getElementById("closeModalBtn").addEventListener("click", closeStaffModal);
+
+  document.getElementById("staffRespondForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const code = document.getElementById("modalReportCode").value;
+    const status = document.getElementById("modalStaffStatus").value;
+    const message = document.getElementById("modalStaffMessage").value;
+    const staffName = document.getElementById("modalStaffName").value;
+
+    vgUpdateReport(code, status, message, staffName);
+    closeStaffModal();
+    renderStaffTable();
+  });
+}
+
+function renderStaffTable() {
+  const tbody = document.getElementById("staffReportsTbody");
+  if (!tbody) return;
+
+  const districtFilter = document.getElementById("staffDistrictFilter").value || "ALL";
+  const statusFilter = document.getElementById("staffStatusFilter").value || "ALL";
+
+  let reports = vgGetAllReports();
+  if (districtFilter !== "ALL") reports = reports.filter(r => r.district === districtFilter);
+  if (statusFilter !== "ALL") reports = reports.filter(r => r.status === statusFilter);
+
+  const allReports = vgGetAllReports();
+  document.getElementById("staffTotalCount").textContent = allReports.length;
+
+  if (vgCurrentRole === "admin") {
+    document.getElementById("adminStatSubmitted").textContent = allReports.filter(r => r.status === "Submitted").length;
+    document.getElementById("adminStatReview").textContent = allReports.filter(r => r.status === "Under Review").length;
+    document.getElementById("adminStatAction").textContent = allReports.filter(r => r.status === "Action Taken").length;
+    document.getElementById("adminStatDistricts").textContent = new Set(allReports.map(r => r.district)).size;
+  }
+
+  if (!reports.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 24px;">No reports match this filter yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = reports.map(function (r) {
+    const preview = r.description.length > 60 ? r.description.slice(0, 60) + "…" : r.description;
+    const deleteBtn = vgCurrentRole === "admin"
+      ? ' <button class="btn-row-action" style="background: var(--emergency);" onclick="deleteReportRow(\'' + r.code + '\')">Delete</button>'
+      : "";
+    return (
+      "<tr>" +
+        "<td><strong>" + r.code + "</strong></td>" +
+        "<td>" + r.district + "</td>" +
+        "<td>" + r.abuseType + "</td>" +
+        '<td><span class="status-badge ' + statusClass(r.status) + '">' + r.status + "</span></td>" +
+        "<td>" + r.date + "</td>" +
+        "<td>" + escapeHtml(preview) + "</td>" +
+        '<td><button class="btn-row-action" onclick="openStaffModal(\'' + r.code + '\')">Respond</button>' + deleteBtn + "</td>" +
+      "</tr>"
+    );
+  }).join("");
+}
+
+function deleteReportRow(code) {
+  if (!confirm("Delete report " + code + "? This cannot be undone.")) return;
+  const reports = vgGetAllReports().filter(function (r) { return r.code !== code; });
+  vgSaveAllReports(reports);
+  renderStaffTable();
+}
+
+function openStaffModal(code) {
+  const report = vgGetReport(code);
+  if (!report) return;
+
+  document.getElementById("modalReportCode").value = report.code;
+  document.getElementById("modalCodeDisplay").textContent = report.code;
+  document.getElementById("modalDescDisplay").textContent = report.description;
+  document.getElementById("modalStaffStatus").value = report.status;
+  document.getElementById("modalStaffMessage").value = "";
+
+  document.getElementById("staffModalOverlay").style.display = "flex";
+}
+
+function closeStaffModal() {
+  document.getElementById("staffModalOverlay").style.display = "none";
+}
