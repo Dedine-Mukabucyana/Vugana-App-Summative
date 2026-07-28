@@ -2,7 +2,7 @@
 
 Vugana ("Speak Out") is a web platform that lets GBV survivors and witnesses in Rwanda report incidents anonymously, track their report using a private code, find their nearest Isange One Stop Centre, and learn their legal rights — all without creating an account or revealing their identity.
 
-**Live demo:** https://dedine-mukabucyana.github.io/Vugana-App-Summative/
+**Live demo:** https://vugana-app.vercel.app/
 
 **SRS document:** *(add your SRS Google Doc / PDF link here)*
 
