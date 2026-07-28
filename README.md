@@ -70,7 +70,7 @@ A production version would need a real backend (API + database + authentication)
 
 ## Project Documents
 
-- **SRS (Software Requirements Specification):** *(link here)*
+- **SRS (Software Requirements Specification):** https://docs.google.com/document/d/1baTEf1O9a52VC8jEeCAMW7ZupeRQ0RR_cVERh9vJTEE/edit?tab=t.0
 - **Demo video:** *(link here)*
 
 ## Credits
