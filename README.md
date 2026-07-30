@@ -4,7 +4,10 @@ Vugana ("Speak Out") is a web platform that lets GBV survivors and witnesses in 
 
 **Live demo:** https://vugana-app.vercel.app/
 
-**SRS document:** *(add your SRS Google Doc / PDF link here)*
+- **Demo video:** https://www.youtube.com/watch?v=HdwoLpn2epA
+
+
+**SRS document:** https://docs.google.com/document/d/1baTEf1O9a52VC8jEeCAMW7ZupeRQ0RR_cVERh9vJTEE/edit?tab=t.0
 
 ---
 
@@ -71,7 +74,7 @@ A production version would need a real backend (API + database + authentication)
 ## Project Documents
 
 - **SRS (Software Requirements Specification):** https://docs.google.com/document/d/1baTEf1O9a52VC8jEeCAMW7ZupeRQ0RR_cVERh9vJTEE/edit?tab=t.0
-- **Demo video:** *(link here)*
+- **Demo video:** https://www.youtube.com/watch?v=HdwoLpn2epA
 
 ## Credits
 
